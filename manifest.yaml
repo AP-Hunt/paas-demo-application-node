@@ -1,0 +1,7 @@
+---
+applications:
+- name: amazing-application
+  buildpacks:
+  - https://github.com/cloudfoundry/nodejs-buildpack.git
+  env:
+    DEBUG: true

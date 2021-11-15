@@ -5,12 +5,23 @@ import Koa from 'koa';
 import mount from 'koa-mount';
 import serve from 'koa-static';
 import { render } from 'mustache';
+import pino from 'pino';
 
-const home = readFileSync('./src/template/index.html').toString();
-
-const PORT = process.env.PORT || 3000;
 const BADGE = process.env.BADGE;
 const DATABASE_URL = process.env.DATABASE_URL;
+const DEBUG = process.env.DEBUG;
+const PORT = process.env.PORT || 3000;
+
+const logger = pino({
+  level: DEBUG === 'true' ? 'debug' : 'info',
+});
+
+logger.debug({ provided: !!BADGE }, 'application accepts BADGE environment variable');
+logger.debug({ provided: !!DATABASE_URL }, 'application accepts DATABASE_URL environment variable');
+logger.debug({ provided: !!DEBUG }, 'application accepts DEBUG environment variable');
+logger.debug({ provided: !!PORT }, 'application accepts PORT environment variable');
+
+const home = readFileSync('./src/template/index.html').toString();
 
 const app = new Koa();
 const router = new Router();
@@ -30,4 +41,5 @@ app
   .use(router.routes())
   .use(router.allowedMethods());
 
+logger.info({ PORT }, 'listening');
 app.listen(PORT);
